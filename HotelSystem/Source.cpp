@@ -16,21 +16,9 @@ public:
 	//Constructor
 	Date(int Day = 1, int Month = 1, int Year = StartYear)
 	{
-		if (Year >= StartYear && Year <= EndYear)
-			//Check date validity
-			if (((Month > 12 || Month < 1 || Day < 1 || Day > 31 ||
-					Month == 4 || Month == 6 || Month == 9 || Month == 11) && Day > 30) ||					//accounts for 30-day months
-					(Month == 2 && Year % 4 != 0 && Day > 28) ||											//accounts for February
-					(Year%4==0 && Month == 2 && Day > 29))													//acounts for leap years
-
-					throw("Invalid date");
-			else	
-				{
-					day = Day;
-					month = Month;						
-					year = Year;
-				}
-		else throw ("Date is outside of the schedule's scope");
+				day = Day;
+				month = Month;
+				year = Year;
 	}
 
 	void operator++ ()
@@ -142,6 +130,27 @@ public:
 
 
 
+//Checks for valid date
+bool DateCorrect(int Day, int Month, int Year)						
+{
+	if (Year >= StartYear && Year <= EndYear)
+
+		if ((Month > 12 || Month < 1 || Day < 1 || Day > 31 ||
+			(Month == 4 || Month == 6 || Month == 9 || Month == 11) && Day > 30) ||					//accounts for 30-day months
+			(Month == 2 && Year % 4 != 0 && Day > 28) ||											//accounts for February
+			(Year % 4 == 0 && Month == 2 && Day > 29))													//acounts for leap years
+
+		{
+			std::cout << "Incorrect date";
+			return 0;
+		}
+		else return 1;
+	else
+	{
+		std::cout << "Date is outside of the schedule's scope";
+		return 0;
+	}
+}
 
 
 /*
@@ -173,10 +182,12 @@ int main()
 {
 	//InputRooms();
 
-	std::ifstream RoomFile;
+	/*std::ifstream RoomFile;
 	RoomFile.open("Rooms.txt", std::ios::in);
 	Room TestRoom(0, 0);
 	RoomFile.read((char*)&TestRoom, sizeof(TestRoom));
-	TestRoom.print();
+	TestRoom.print();*/
+
+
 
 }
