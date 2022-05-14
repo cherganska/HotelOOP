@@ -54,13 +54,31 @@ public:
 		else day++;
 	}
 
+	bool operator>= (Date date2)
+	{
+		if (year > date2.year) return 1;
+		else
+			if (year == date2.year && month > date2.month) return 1;
+			else
+				if (year == date2.year && month == date2.month && day >= date2.day) return 1;
+				else return 0;
+	}
+
+	bool operator<= (Date date2)
+	{
+		if (year < date2.year) return 1;
+		else
+			if (year == date2.year && month < date2.month) return 1;
+			else
+				if (year == date2.year && month == date2.month && day <= date2.day) return 1;
+				else return 0;
+	}
 };
 
 class Room
 {
 private:
 	int number, beds;
-	Date* Taken;
 public:
 	Room(int Num, int Bed)
 	{
