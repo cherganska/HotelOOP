@@ -120,11 +120,23 @@ public:
 		ResCounter = 0;
 	}
 
+	~Room()
+	{
+		delete[] Booked;
+	}
+
 	void Book(Reservation Save)
 	{
 		Booked[ResCounter] = Save;
 		ResCounter++;
 	}
+
+
+	void print()
+	{
+	std::cout << number << " " << beds << std::endl;
+	}
+
 
 };
 
@@ -132,9 +144,25 @@ public:
 
 
 
+/*
+void InputRooms()
+{
+	int Rooms, Number, Beds;
+	std::cout << "Number of rooms: ";
+	std::cin >> Rooms;
+	
+	std::ofstream RoomFile;
+	RoomFile.open("Rooms.txt", std::ios::out);
 
-
-
+	for (int i = 0; i < Rooms; i++)
+	{
+		std::cout << "Room number and beds:";
+		std::cin >> Number >> Beds;
+		Room NewRoom(Number, Beds);
+		RoomFile.write((char*)&NewRoom, sizeof(NewRoom));
+	}
+}
+*/
 
 
 
@@ -143,5 +171,12 @@ public:
 
 int main()
 {
+	//InputRooms();
+
+	std::ifstream RoomFile;
+	RoomFile.open("Rooms.txt", std::ios::in);
+	Room TestRoom(0, 0);
+	RoomFile.read((char*)&TestRoom, sizeof(TestRoom));
+	TestRoom.print();
 
 }
