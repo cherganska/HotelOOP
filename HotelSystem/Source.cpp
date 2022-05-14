@@ -7,7 +7,7 @@ const int StartYear = 2020;
 const int EndYear = 2030;
 
 const int MaxRes = 20;
-const int MaxRooms = 20;
+const int NumberOfRooms = 15;
 
 
 class Date
@@ -140,7 +140,7 @@ bool DateCorrect(int Day, int Month, int Year)
 		if ((Month > 12 || Month < 1 || Day < 1 || Day > 31 ||
 			(Month == 4 || Month == 6 || Month == 9 || Month == 11) && Day > 30) ||					//accounts for 30-day months
 			(Month == 2 && Year % 4 != 0 && Day > 28) ||											//accounts for February
-			(Year % 4 == 0 && Month == 2 && Day > 29))													//acounts for leap years
+			(Year % 4 == 0 && Month == 2 && Day > 29))												//acounts for leap years
 
 		{
 			std::cout << "Incorrect date";
@@ -159,7 +159,7 @@ bool DateCorrect(int Day, int Month, int Year)
 void InputRooms()
 {
 	int Rooms, Number, Beds;
-	std::cout << "Number of rooms (has to be less than " << MaxRooms << "): ";
+	std::cout << "Number of rooms: ";
 	std::cin >> Rooms;
 	
 	std::ofstream RoomFile;
@@ -176,7 +176,7 @@ void InputRooms()
 */
 
 
-
+//Menu
 int Selection()
 {
 	std::cout << "Which action would you like to take?" << std::endl;
@@ -187,14 +187,15 @@ int Selection()
 	std::cout << "4) Check number of days rooms were used" << std::endl;
 	std::cout << "5) Find a room" << std::endl;
 	std::cout << "6) Mark room as unavailable" << std::endl;
+	std::cout << "7) Exit" << std::endl;
 	std::cout << std::endl;
 	
 	int Input;
 		do
 		{
-			std::cout << "Please choose a command between 1-6" << std::endl;
+			std::cout << "Please choose a command between 1-7" << std::endl;
 			std::cin >> Input;
-		} while (Input < 1 || Input > 6);
+		} while (Input < 1 || Input > 7);
 	return Input;
 }
 
@@ -203,18 +204,27 @@ int main()
 {
 	//InputRooms();
 
-	std::ifstream RoomFile;
+	std::fstream RoomFile;
 	RoomFile.open("Rooms.txt", std::ios::in);
 
-	int NumberOfRooms = 0;
-	Room Rooms[MaxRooms];
+	Room Rooms[NumberOfRooms];
 
-	while (!RoomFile.eof())
+	for (int i = 0; i < NumberOfRooms; i++)
 	{
-		RoomFile.read((char*)&Rooms[NumberOfRooms], sizeof(Rooms[NumberOfRooms]));
-		NumberOfRooms++;
+		RoomFile.read((char*)&Rooms[i], sizeof(Rooms[i]));
+		Rooms[i].print();
 	}
-	NumberOfRooms++;
 
-	Selection();
+	int operation;
+	do
+	{
+		operation = Selection();
+	} while (operation != 7);
+
+	RoomFile.close();
+	RoomFile.open("Rooms.txt", std::ios::out);
+	for (int i = 0; i < NumberOfRooms; i++)
+	{
+		RoomFile.write((char*)&Rooms[i], sizeof(Rooms[i]));
+	}
 }
