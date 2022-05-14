@@ -5,6 +5,7 @@
 //Years between which the program functions
 const int StartYear = 2020;
 const int EndYear = 2030;
+int MaxRes = 20;
 
 
 class Date
@@ -18,9 +19,9 @@ public:
 		if (Year >= StartYear && Year <= EndYear)
 			//Check date validity
 			if (((Month > 12 || Month < 1 || Day < 1 || Day > 31 ||
-					Month == 4 || Month == 6 || Month == 9 || Month == 11) && Day > 30) ||					//account for 30-day months
-					(Month == 2 && Year % 4 != 0 && Day > 28) ||											//account for February
-					(Year%4==0 && Month == 2 && Day > 29))													//acount for leap years
+					Month == 4 || Month == 6 || Month == 9 || Month == 11) && Day > 30) ||					//accounts for 30-day months
+					(Month == 2 && Year % 4 != 0 && Day > 28) ||											//accounts for February
+					(Year%4==0 && Month == 2 && Day > 29))													//acounts for leap years
 
 					throw("Invalid date");
 			else	
@@ -75,14 +76,72 @@ public:
 	}
 };
 
+class Reservation
+{
+private:
+	std::string Guest, Notes;
+	Date From, To;
+
+public:
+	Reservation()
+	{
+		Guest = "";
+		Notes = "";
+	}
+	Reservation(std::string Name, Date DateFrom, Date DateTo, std::string Info = "No extra notes")
+	{
+		Guest = Name;
+		Notes = Info;
+		if (DateFrom <= DateTo)
+		{
+			From = DateFrom;
+			To = DateTo;
+		}
+		else
+		{
+			From = DateTo;
+			To = DateFrom;
+		}
+	}
+};
+
+
 class Room
 {
 private:
-	int number, beds;
+	int number, beds, ResCounter;
+	Reservation* Booked;
 public:
 	Room(int Num, int Bed)
 	{
 		number = Num;
 		beds = Bed;
+		Booked = new Reservation[MaxRes];
+		ResCounter = 0;
 	}
+
+	void Book(Reservation Save)
+	{
+		Booked[ResCounter] = Save;
+		ResCounter++;
+	}
+
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int main()
+{
+
+}
