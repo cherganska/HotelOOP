@@ -5,7 +5,9 @@
 //Years between which the program functions
 const int StartYear = 2020;
 const int EndYear = 2030;
-int MaxRes = 20;
+
+const int MaxRes = 20;
+const int MaxRooms = 20;
 
 
 class Date
@@ -100,7 +102,7 @@ private:
 	int number, beds, ResCounter;
 	Reservation* Booked;
 public:
-	Room(int Num, int Bed)
+	Room(int Num = 0, int Bed = 0)
 	{
 		number = Num;
 		beds = Bed;
@@ -157,7 +159,7 @@ bool DateCorrect(int Day, int Month, int Year)
 void InputRooms()
 {
 	int Rooms, Number, Beds;
-	std::cout << "Number of rooms: ";
+	std::cout << "Number of rooms (has to be less than " << MaxRooms << "): ";
 	std::cin >> Rooms;
 	
 	std::ofstream RoomFile;
@@ -182,12 +184,18 @@ int main()
 {
 	//InputRooms();
 
-	/*std::ifstream RoomFile;
+	std::ifstream RoomFile;
 	RoomFile.open("Rooms.txt", std::ios::in);
-	Room TestRoom(0, 0);
-	RoomFile.read((char*)&TestRoom, sizeof(TestRoom));
-	TestRoom.print();*/
 
+	int NumberOfRooms = 0;
+	Room Rooms[MaxRooms];
+
+	while (!RoomFile.eof())
+	{
+		RoomFile.read((char*)&Rooms[NumberOfRooms], sizeof(Rooms[NumberOfRooms]));
+		NumberOfRooms++;
+	}
+	NumberOfRooms++;
 
 
 }
