@@ -110,10 +110,10 @@ public:
 		ResCounter = 0;
 	}
 
-	~Room()
+	/*~Room()
 	{
 		delete[] Booked;
-	}
+	}*/
 
 	void Book(Reservation Save)
 	{
@@ -177,7 +177,26 @@ void InputRooms()
 
 
 
-
+int Selection()
+{
+	std::cout << "Which action would you like to take?" << std::endl;
+	std::cout << std::endl;
+	std::cout << "1) Make a reservation" << std::endl;
+	std::cout << "2) Find vacant rooms by date" << std::endl;
+	std::cout << "3) Mark room as free" << std::endl;
+	std::cout << "4) Check number of days rooms were used" << std::endl;
+	std::cout << "5) Find a room" << std::endl;
+	std::cout << "6) Mark room as unavailable" << std::endl;
+	std::cout << std::endl;
+	
+	int Input;
+		do
+		{
+			std::cout << "Please choose a command between 1-6" << std::endl;
+			std::cin >> Input;
+		} while (Input < 1 || Input > 6);
+	return Input;
+}
 
 
 int main()
@@ -197,5 +216,5 @@ int main()
 	}
 	NumberOfRooms++;
 
-
+	Selection();
 }
