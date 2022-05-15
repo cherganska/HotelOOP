@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
+using namespace std;
 //Years between which the program functions
 const int StartYear = 2020;
 const int EndYear = 2030;
@@ -66,19 +66,42 @@ public:
 	}
 };
 
+//Checks for valid date
+bool DateCorrect(int Day, int Month, int Year)
+{
+	if (Year >= StartYear && Year <= EndYear)
+	{
+		if ((Month > 12 || Month < 1 || Day < 1 || Day > 31 ||
+			(Month == 4 || Month == 6 || Month == 9 || Month == 11) && Day > 30) ||					//accounts for 30-day months
+			(Month == 2 && Year % 4 != 0 && Day > 28) ||											//accounts for February
+			(Year % 4 == 0 && Month == 2 && Day > 29))												//acounts for leap years
+
+		{
+			cout << "Incorrect date\n";
+			return 0;
+		}
+		else return 1;
+	}
+	else
+	{
+		cout << "Date is outside of the schedule's scope\n";
+		return 0;
+	}
+}
+
 class Reservation
 {
 private:
-	std::string Guest, Notes;
+	string Guest, Notes;
 	Date From, To;
-
 public:
+	
 	Reservation()
 	{
 		Guest = "";
 		Notes = "";
 	}
-	Reservation(std::string Name, Date DateFrom, Date DateTo, std::string Info = "No extra notes")
+	Reservation(string Name, Date DateFrom, Date DateTo, string Info = "")
 	{
 		Guest = Name;
 		Notes = Info;
@@ -93,6 +116,17 @@ public:
 			To = DateFrom;
 		}
 	}
+
+	Date getFrom()
+	{
+		return From;
+	}
+	Date getTo()
+	{
+		return To;
+	}
+
+	
 };
 
 
@@ -124,33 +158,112 @@ public:
 
 	void print()
 	{
-	std::cout << number << " " << beds << std::endl;
+	cout << number << " " << beds << "" << ResCounter << endl;
 	}
 
-
+	friend void BookRoom(Room Rooms[NumberOfRooms]);
+	friend void FindVacant(Room Rooms[NumberOfRooms]);
 };
 
-
-
-//Checks for valid date
-bool DateCorrect(int Day, int Month, int Year)						
+void BookRoom(Room Rooms[NumberOfRooms])
 {
-	if (Year >= StartYear && Year <= EndYear)
+	int num;
+	cout << "Which room would you like to book?" << endl;
+	cin >> num;
 
-		if ((Month > 12 || Month < 1 || Day < 1 || Day > 31 ||
-			(Month == 4 || Month == 6 || Month == 9 || Month == 11) && Day > 30) ||					//accounts for 30-day months
-			(Month == 2 && Year % 4 != 0 && Day > 28) ||											//accounts for February
-			(Year % 4 == 0 && Month == 2 && Day > 29))												//acounts for leap years
-
-		{
-			std::cout << "Incorrect date";
-			return 0;
-		}
-		else return 1;
-	else
+	bool found = 0, free = 1;
+	int i;
+	for (i = 0; i < NumberOfRooms; i++)
 	{
-		std::cout << "Date is outside of the schedule's scope";
-		return 0;
+		if (Rooms[i].number == num)
+		{
+			found = 1;
+			break;
+		}
+	}
+	if (found)
+	{
+		int day, month, year;
+		do
+		{
+			cout << "Insert first day of reservation (DD MM YYYY): ";
+			cin >> day >> month >> year;
+		} while (DateCorrect(day, month, year) == 0);
+		Date from(day, month, year);
+		do
+		{
+			cout << "Insert last day of reservation (DD MM YYYY): ";
+			cin >> day >> month >> year;
+		} while (DateCorrect(day, month, year) == 0);
+		Date to(day, month, year);
+
+		if (to <= from)
+		{
+			Date Placeholder;
+			Placeholder = to;
+			to = from;
+			from = Placeholder;
+		}
+
+
+		for (int j = 0; j < Rooms[i].ResCounter; j++)
+		{
+			if ((to >= Rooms[i].Booked[j].getFrom() && to <= Rooms[i].Booked[j].getTo()) ||
+				(from >= Rooms[i].Booked[j].getFrom() && from <= Rooms[i].Booked[j].getTo()) ||
+				(Rooms[i].Booked[j].getFrom() >= from && Rooms[i].Booked[j].getTo() <= to))
+			{
+				free = 0;
+				break;
+			}
+		}
+		if (free)
+		{
+			cout << endl;
+			cout << "Guest Name: ";
+			string Name, Notes = "";
+			getline(cin>>ws, Name, '\n');
+			cout << "Are there any notes to the reservation?" << endl;;
+			char answer;
+			do
+			{
+				cout << "Type y / n: ";
+				cin >> answer;
+			} while (answer != 'y' && answer != 'n');
+			if (answer == 'y')
+			{
+				cout << "Notes: ";
+				getline(cin>>ws, Notes, '\n');
+			}
+			Reservation New(Name, from, to, Notes);
+			
+			Rooms[i].Book(New);
+		}
+	}
+	else cout << "A room with that number doesn't exist" << endl;;
+}
+
+void FindVacant(Room Rooms[NumberOfRooms])
+{
+	int day, month, year;
+	cout << "Insert Date (DD MM YYYY): ";
+	cin >> day >> month >> year;
+	if (DateCorrect(day, month, year))
+	{
+		cout << "Free rooms:" << endl;
+		Date Chosen(day, month, year);
+		for (int i = 0; i < NumberOfRooms; i++)
+		{
+			bool busy = 0;
+			for (int j = 0; j < Rooms[i].ResCounter; j++)
+			{
+				if (Chosen >= Rooms[i].Booked[j].getFrom() && Chosen <= Rooms[i].Booked[j].getTo())
+				{
+					busy = 1;
+					break;
+				}
+			}
+			if (!busy) cout << Rooms[i].number << endl;;
+		}
 	}
 }
 
@@ -159,16 +272,16 @@ bool DateCorrect(int Day, int Month, int Year)
 void InputRooms()
 {
 	int Rooms, Number, Beds;
-	std::cout << "Number of rooms: ";
-	std::cin >> Rooms;
+	cout << "Number of rooms: ";
+	cin >> Rooms;
 	
-	std::ofstream RoomFile;
-	RoomFile.open("Rooms.txt", std::ios::out);
+	ofstream RoomFile;
+	RoomFile.open("Rooms.txt", ios::out);
 
 	for (int i = 0; i < Rooms; i++)
 	{
-		std::cout << "Room number and beds:";
-		std::cin >> Number >> Beds;
+		cout << "Room number and beds:";
+		cin >> Number >> Beds;
 		Room NewRoom(Number, Beds);
 		RoomFile.write((char*)&NewRoom, sizeof(NewRoom));
 	}
@@ -179,22 +292,22 @@ void InputRooms()
 //Menu
 int Selection()
 {
-	std::cout << "Which action would you like to take?" << std::endl;
-	std::cout << std::endl;
-	std::cout << "1) Make a reservation" << std::endl;
-	std::cout << "2) Find vacant rooms by date" << std::endl;
-	std::cout << "3) Mark room as free" << std::endl;
-	std::cout << "4) Check number of days rooms were used" << std::endl;
-	std::cout << "5) Find a room" << std::endl;
-	std::cout << "6) Mark room as unavailable" << std::endl;
-	std::cout << "7) Exit" << std::endl;
-	std::cout << std::endl;
+	cout << "Which action would you like to take?" << endl;
+	cout << endl;
+	cout << "1) Make a reservation" << endl;
+	cout << "2) Find vacant rooms by date" << endl;
+	cout << "3) Mark room as free" << endl;
+	cout << "4) Check number of days rooms were used" << endl;
+	cout << "5) Find a room" << endl;
+	cout << "6) Mark room as unavailable" << endl;
+	cout << "7) Exit" << endl;
+	cout << endl;
 	
 	int Input;
 		do
 		{
-			std::cout << "Please choose a command between 1-7" << std::endl;
-			std::cin >> Input;
+			cout << "Please choose a command between 1-7" << endl;
+			cin >> Input;
 		} while (Input < 1 || Input > 7);
 	return Input;
 }
@@ -204,8 +317,8 @@ int main()
 {
 	//InputRooms();
 
-	std::fstream RoomFile;
-	RoomFile.open("Rooms.txt", std::ios::in);
+	fstream RoomFile;
+	RoomFile.open("Rooms.txt", ios::in);
 
 	Room Rooms[NumberOfRooms];
 
@@ -219,10 +332,38 @@ int main()
 	do
 	{
 		operation = Selection();
+		switch (operation)
+		{
+		case 1:
+		{
+			BookRoom(Rooms);
+		}
+		case 2:
+		{
+			FindVacant(Rooms);
+		}
+		case 3:
+		{
+
+		}
+		case 4:
+		{
+
+		}
+		case 5:
+		{
+
+		}
+		case 6:
+		{
+
+		}
+		}
+		cout << "....." << endl;
 	} while (operation != 7);
 
 	RoomFile.close();
-	RoomFile.open("Rooms.txt", std::ios::out);
+	RoomFile.open("Rooms.txt", ios::out);
 	for (int i = 0; i < NumberOfRooms; i++)
 	{
 		RoomFile.write((char*)&Rooms[i], sizeof(Rooms[i]));
