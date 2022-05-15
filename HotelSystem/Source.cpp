@@ -215,6 +215,7 @@ public:
 	friend void FindVacant(Room Rooms[NumberOfRooms]);
 	friend bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i);
 	friend void CheckBusy(Room Rooms[NumberOfRooms]);
+	friend void LookForRoom(Room Rooms[NumberOfRooms]);
 };
 
 bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i)
@@ -386,9 +387,55 @@ void CheckBusy(Room Rooms[NumberOfRooms])
 
 }
 
-void LookForRoom()
+void LookForRoom(Room Rooms[NumberOfRooms])
 {
+	int day, month, year, beds;
+	do
+	{
+		cout << "Insert start date (DD MM YYYY): ";
+		cin >> day >> month >> year;
+	} while (DateCorrect(day, month, year) == 0);
+	Date from(day, month, year);
+	do
+	{
+		cout << "Insert end date (DD MM YYYY): ";
+		cin >> day >> month >> year;
+	} while (DateCorrect(day, month, year) == 0);
+	Date to(day, month, year);
 
+	do
+	{
+		cout << "Beds: ";
+		cin >> beds;
+		if (beds < 0 || beds > 3) cout << "Rooms with that number of beds don't exist";
+	} while (beds < 0 || beds > 3);
+	cout << endl;
+
+	bool found = 0;
+	for (int checkbeds = beds; checkbeds <= 3; checkbeds++)
+	{
+		for (int i = 0; i < NumberOfRooms; i++)
+		{
+			if (Rooms[i].beds == checkbeds)
+			{
+				bool free = 1;
+				for (int j = 0; j < Rooms[i].ResCounter; j++)
+				{
+					if (from >= Rooms[i].Booked->getFrom() && from <= Rooms[i].Booked->getTo())
+						free = 0;
+					else if (Rooms[i].Booked->getFrom() > from && to >= Rooms[i].Booked->getFrom())
+						free = 0;
+				}
+				if (free)
+				{
+					cout << Rooms[i].number;
+					found = 1;
+				}
+			}
+		}
+		if (found) break;
+	}
+	if (!found) cout << "No available rooms." << endl;
 }
 
 
@@ -493,7 +540,7 @@ int main()
 		}
 		case 5:
 		{
-			LookForRoom()
+			LookForRoom(Rooms);
 		}
 		case 6:
 		{
@@ -504,9 +551,9 @@ int main()
 	} while (operation != 7);
 
 	RoomFile.close();
-	RoomFile.open("Rooms.txt", ios::out);
+	/*RoomFile.open("Rooms.txt", ios::out);
 	for (int i = 0; i < NumberOfRooms; i++)
 	{
 		RoomFile.write((char*)&Rooms[i], sizeof(Rooms[i]));
-	}
+	}*/
 }
