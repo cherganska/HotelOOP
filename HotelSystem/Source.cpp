@@ -129,7 +129,7 @@ public:
 	{
 		Guest = Name;
 		Notes = Info;
-		if (DateFrom <= DateTo)
+		if (DateTo > DateFrom)
 		{
 			From = DateFrom;
 			To = DateTo;
@@ -163,8 +163,8 @@ public:
 
 	void operator= (Reservation Second)
 	{
-		Guest = Second.Guest;
-		Notes = Second.Notes;
+		Guest.assign(Second.Guest);
+		Notes.assign(Second.Notes);
 		From = Second.From;
 		To = Second.To;
 	}
@@ -212,7 +212,6 @@ public:
 	}*/
 
 	friend bool Available(Room Rooms[NumberOfRooms], int i, Date from, Date to);
-	friend void BookRoom(Room Rooms[NumberOfRooms]);
 	friend void FindVacant(Room Rooms[NumberOfRooms]);
 	friend bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i);
 	friend void CheckBusy(Room Rooms[NumberOfRooms]);
