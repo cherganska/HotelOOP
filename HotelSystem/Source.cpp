@@ -18,9 +18,9 @@ public:
 	//Constructor
 	Date(int Day = 1, int Month = 1, int Year = StartYear)
 	{
-				day = Day;
-				month = Month;
-				year = Year;
+		day = Day;
+		month = Month;
+		year = Year;
 	}
 
 	void operator++ ()
@@ -95,7 +95,7 @@ private:
 	string Guest, Notes;
 	Date From, To;
 public:
-	
+
 	Reservation()
 	{
 		Guest = "";
@@ -126,7 +126,24 @@ public:
 		return To;
 	}
 
-	
+
+	void setFrom(Date date)
+	{
+		From = date;
+	}
+	void setTo(Date date)
+	{
+		To=date;
+	}
+
+
+	void operator= (Reservation Second)
+	{
+		Guest = Second.Guest;
+		Notes = Second.Notes;
+		From = Second.From;
+		To = Second.To;
+	}
 };
 
 
@@ -155,15 +172,37 @@ public:
 		ResCounter++;
 	}
 
-
-	void print()
+	void Free(Date Clear)
 	{
-	cout << number << " " << beds << "" << ResCounter << endl;
+		for (int i = 0; i < ResCounter; i++)
+		{
+			if (Booked->getFrom() <= Clear && Booked->getTo() >= Clear)
+			{
+				Booked->setTo(Clear);
+			}
+		}
 	}
+	/*void print()
+	{
+		cout << number << " " << beds << "" << ResCounter << endl;
+	}*/
 
 	friend void BookRoom(Room Rooms[NumberOfRooms]);
 	friend void FindVacant(Room Rooms[NumberOfRooms]);
+	friend bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i);
 };
+
+bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i)
+{
+	for (i = 0; i < NumberOfRooms; i++)
+	{
+		if (Rooms[i].number == num)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
 
 void BookRoom(Room Rooms[NumberOfRooms])
 {
@@ -173,15 +212,8 @@ void BookRoom(Room Rooms[NumberOfRooms])
 
 	bool found = 0, free = 1;
 	int i;
-	for (i = 0; i < NumberOfRooms; i++)
-	{
-		if (Rooms[i].number == num)
-		{
-			found = 1;
-			break;
-		}
-	}
-	if (found)
+	
+	if (FindRoom(num, Rooms, i))
 	{
 		int day, month, year;
 		do
@@ -221,7 +253,7 @@ void BookRoom(Room Rooms[NumberOfRooms])
 			cout << endl;
 			cout << "Guest Name: ";
 			string Name, Notes = "";
-			getline(cin>>ws, Name, '\n');
+			getline(cin >> ws, Name, '\n');
 			cout << "Are there any notes to the reservation?" << endl;;
 			char answer;
 			do
@@ -232,10 +264,10 @@ void BookRoom(Room Rooms[NumberOfRooms])
 			if (answer == 'y')
 			{
 				cout << "Notes: ";
-				getline(cin>>ws, Notes, '\n');
+				getline(cin >> ws, Notes, '\n');
 			}
 			Reservation New(Name, from, to, Notes);
-			
+
 			Rooms[i].Book(New);
 		}
 	}
@@ -268,16 +300,16 @@ void FindVacant(Room Rooms[NumberOfRooms])
 }
 
 
+
 /*
 void InputRooms()
 {
 	int Rooms, Number, Beds;
 	cout << "Number of rooms: ";
 	cin >> Rooms;
-	
+
 	ofstream RoomFile;
 	RoomFile.open("Rooms.txt", ios::out);
-
 	for (int i = 0; i < Rooms; i++)
 	{
 		cout << "Room number and beds:";
@@ -302,13 +334,13 @@ int Selection()
 	cout << "6) Mark room as unavailable" << endl;
 	cout << "7) Exit" << endl;
 	cout << endl;
-	
+
 	int Input;
-		do
-		{
-			cout << "Please choose a command between 1-7" << endl;
-			cin >> Input;
-		} while (Input < 1 || Input > 7);
+	do
+	{
+		cout << "Please choose a command between 1-7" << endl;
+		cin >> Input;
+	} while (Input < 1 || Input > 7);
 	return Input;
 }
 
@@ -325,7 +357,7 @@ int main()
 	for (int i = 0; i < NumberOfRooms; i++)
 	{
 		RoomFile.read((char*)&Rooms[i], sizeof(Rooms[i]));
-		Rooms[i].print();
+		//Rooms[i].print();
 	}
 
 	int operation;
@@ -337,14 +369,31 @@ int main()
 		case 1:
 		{
 			BookRoom(Rooms);
+			break;
 		}
 		case 2:
 		{
 			FindVacant(Rooms);
+			break;
 		}
 		case 3:
 		{
+			int num, i;
+			cout << "Which room would you like to free?";
+			cin >> num;
 
+			if (FindRoom(num, Rooms, i))
+			{
+				int day, month, year;
+				do
+				{
+					cout << "Enter date (DD MM YYYY): ";
+					cin >> day >> month >> year;
+				} while (DateCorrect(day, month, year) == 0);
+				Rooms[i].Free(Date(day, month, year));
+			}
+			else "A room with that number doesn't exist";
+			break;
 		}
 		case 4:
 		{
@@ -363,9 +412,9 @@ int main()
 	} while (operation != 7);
 
 	RoomFile.close();
-	RoomFile.open("Rooms.txt", ios::out);
+	/*RoomFile.open("Rooms.txt", ios::out);
 	for (int i = 0; i < NumberOfRooms; i++)
 	{
 		RoomFile.write((char*)&Rooms[i], sizeof(Rooms[i]));
-	}
+	}*/
 }
