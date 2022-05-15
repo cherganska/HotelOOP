@@ -23,27 +23,7 @@ public:
 		year = Year;
 	}
 
-	void operator++ ()
-	{
-		if (day == 31 ||
-			((month == 4 || month == 6 || month == 9 || month == 11) && day == 30) ||
-			(month == 2 && year % 4 != 0 && day == 28) ||
-			(year % 4 == 0 && month == 2 && day == 29))
-		{
-			if (month != 12)
-			{
-				month++;
-				day = 1;
-			}
-			else
-			{
-				year++;
-				month = 1;
-				day = 1;
-			}
-		}
-		else day++;
-	}
+
 
 	bool operator>= (Date date2)
 	{
@@ -52,6 +32,16 @@ public:
 			if (year == date2.year && month > date2.month) return 1;
 			else
 				if (year == date2.year && month == date2.month && day >= date2.day) return 1;
+				else return 0;
+	}
+
+	bool operator> (Date date2)
+	{
+		if (year > date2.year) return 1;
+		else
+			if (year == date2.year && month > date2.month) return 1;
+			else
+				if (year == date2.year && month == date2.month && day > date2.day) return 1;
 				else return 0;
 	}
 
@@ -64,7 +54,41 @@ public:
 				if (year == date2.year && month == date2.month && day <= date2.day) return 1;
 				else return 0;
 	}
+
+	bool operator!= (Date date2)
+	{
+		if (year != date2.year || month != date2.month || day != date2.day)
+			return 1;
+		else return 0;
+	}
+
+	friend Date MoveOne (Date StartDate);
 };
+
+
+Date MoveOne (Date StartDate)
+{
+	Date Temp = StartDate;
+	if (StartDate.day == 31 ||
+		((StartDate.month == 4 || StartDate.month == 6 || StartDate.month == 9 || StartDate.month == 11) && StartDate.day == 30) ||
+		(StartDate.month == 2 && StartDate.year % 4 != 0 && StartDate.day == 28) ||
+		(StartDate.year % 4 == 0 && StartDate.month == 2 && StartDate.day == 29))
+	{
+		if (StartDate.month != 12)
+		{
+			Temp.month++;
+			Temp.day = 1;
+		}
+		else
+		{
+			Temp.year++;
+			Temp.month = 1;
+			Temp.day = 1;
+		}
+	}
+	else Temp.day++;
+	return Temp;
+}
 
 //Checks for valid date
 bool DateCorrect(int Day, int Month, int Year)
@@ -190,6 +214,7 @@ public:
 	friend void BookRoom(Room Rooms[NumberOfRooms]);
 	friend void FindVacant(Room Rooms[NumberOfRooms]);
 	friend bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i);
+	friend void CheckBusy(Room Rooms[NumberOfRooms]);
 };
 
 bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i)
@@ -229,7 +254,7 @@ void BookRoom(Room Rooms[NumberOfRooms])
 		} while (DateCorrect(day, month, year) == 0);
 		Date to(day, month, year);
 
-		if (to <= from)
+		if (from > to)
 		{
 			Date Placeholder;
 			Placeholder = to;
@@ -299,6 +324,72 @@ void FindVacant(Room Rooms[NumberOfRooms])
 	}
 }
 
+void CheckBusy(Room Rooms[NumberOfRooms])
+{
+	int day, month, year;
+	do
+	{
+		cout << "Insert start date (DD MM YYYY): ";
+		cin >> day >> month >> year;
+	} while (DateCorrect(day, month, year) == 0);
+	Date from(day, month, year);
+	do
+	{
+		cout << "Insert end date (DD MM YYYY): ";
+		cin >> day >> month >> year;
+	} while (DateCorrect(day, month, year) == 0);
+	Date to(day, month, year);
+
+	Date Placeholder;
+	if (from >= to)
+	{
+		Placeholder = from;
+		from = to;
+		to = from;
+	}
+
+	for (int i = 0; i < NumberOfRooms; i++)
+	{
+		int counter = 0;
+		for (int j = 0; j < Rooms[i].ResCounter; j++)
+		{
+			int TempCount = 0;
+
+			if (from >= Rooms[i].Booked[j].getFrom())
+			{
+		
+				if (Rooms[i].Booked[j].getTo() >= from)
+				{
+					Placeholder = from;
+						do
+						{
+							TempCount++;
+							MoveOne(Placeholder);
+						} while (Placeholder <= Rooms[i].Booked[j].getTo() && Placeholder <= to);
+
+				}
+			
+			}
+			else if (to >= Rooms[i].Booked[j].getFrom())
+			{
+				Placeholder = Rooms[i].Booked[j].getFrom();
+				do
+				{
+					TempCount++;
+					MoveOne(Placeholder);
+				} while (Placeholder <= Rooms[i].Booked[j].getTo() && Placeholder <= to);
+			}
+			counter += TempCount;
+		}
+		cout << "Room " << Rooms[i].number << " booked for " << counter << " days" << endl;
+	}
+
+}
+
+void LookForRoom()
+{
+
+}
 
 
 /*
@@ -397,11 +488,12 @@ int main()
 		}
 		case 4:
 		{
-
+			CheckBusy(Rooms);
+			break;
 		}
 		case 5:
 		{
-
+			LookForRoom()
 		}
 		case 6:
 		{
