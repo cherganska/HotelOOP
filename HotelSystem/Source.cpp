@@ -62,11 +62,11 @@ public:
 		else return 0;
 	}
 
-	friend Date MoveOne (Date StartDate);
+	friend Date MoveOne(Date StartDate);
 };
 
 
-Date MoveOne (Date StartDate)
+Date MoveOne(Date StartDate)
 {
 	Date Temp = StartDate;
 	if (StartDate.day == 31 ||
@@ -157,7 +157,7 @@ public:
 	}
 	void setTo(Date date)
 	{
-		To=date;
+		To = date;
 	}
 
 
@@ -237,7 +237,7 @@ void BookRoom(Room Rooms[NumberOfRooms])
 
 	bool found = 0, free = 1;
 	int i;
-	
+
 	if (FindRoom(num, Rooms, i))
 	{
 		int day, month, year;
@@ -357,18 +357,18 @@ void CheckBusy(Room Rooms[NumberOfRooms])
 
 			if (from >= Rooms[i].Booked[j].getFrom())
 			{
-		
+
 				if (Rooms[i].Booked[j].getTo() >= from)
 				{
 					Placeholder = from;
-						do
-						{
-							TempCount++;
-							MoveOne(Placeholder);
-						} while (Placeholder <= Rooms[i].Booked[j].getTo() && Placeholder <= to);
+					do
+					{
+						TempCount++;
+						MoveOne(Placeholder);
+					} while (Placeholder <= Rooms[i].Booked[j].getTo() && Placeholder <= to);
 
 				}
-			
+
 			}
 			else if (to >= Rooms[i].Booked[j].getFrom())
 			{
@@ -504,9 +504,9 @@ int main()
 	} while (operation != 7);
 
 	RoomFile.close();
-	/*RoomFile.open("Rooms.txt", ios::out);
+	RoomFile.open("Rooms.txt", ios::out);
 	for (int i = 0; i < NumberOfRooms; i++)
 	{
 		RoomFile.write((char*)&Rooms[i], sizeof(Rooms[i]));
-	}*/
+	}
 }
