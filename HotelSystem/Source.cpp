@@ -187,7 +187,7 @@ public:
 
 	/*~Room()
 	{
-		delete[] Booked;
+		delete[] &Booked;
 	}*/
 
 	void Book(Reservation Save)
@@ -279,6 +279,9 @@ void CheckBusy(Room Rooms[NumberOfRooms])
 		cin >> day >> month >> year;
 	} while (DateCorrect(day, month, year) == 0);
 	Date from(day, month, year);
+	
+	string FileName = "report-" + to_string(year) + "-" + to_string(month) + "-" + to_string(day) + ".txt";
+	
 	do
 	{
 		cout << "Insert end date (DD MM YYYY): ";
@@ -294,42 +297,49 @@ void CheckBusy(Room Rooms[NumberOfRooms])
 		to = from;
 	}
 
-	for (int i = 0; i < NumberOfRooms; i++)
-	{
-		int counter = 0;
-		for (int j = 0; j < Rooms[i].ResCounter; j++)
+	ofstream FoundFile;
+	
+	cout << FileName;
+	FoundFile.open(FileName, ios::out);
+
+
+		for (int i = 0; i < NumberOfRooms; i++)
 		{
-			int TempCount = 0;
-
-			if (from >= Rooms[i].Booked[j].getFrom())
+			int counter = 0;
+			for (int j = 0; j < Rooms[i].ResCounter; j++)
 			{
+				int TempCount = 0;
 
-				if (Rooms[i].Booked[j].getTo() >= from)
+				if (from >= Rooms[i].Booked[j].getFrom())
 				{
-					Placeholder = from;
+
+					if (Rooms[i].Booked[j].getTo() >= from)
+					{
+						Placeholder = from;
+						do
+						{
+							TempCount++;
+							MoveOne(Placeholder);
+						} while (Placeholder <= Rooms[i].Booked[j].getTo() && Placeholder <= to);
+
+					}
+
+				}
+				else if (to >= Rooms[i].Booked[j].getFrom())
+				{
+					Placeholder = Rooms[i].Booked[j].getFrom();
 					do
 					{
 						TempCount++;
 						MoveOne(Placeholder);
 					} while (Placeholder <= Rooms[i].Booked[j].getTo() && Placeholder <= to);
-
 				}
-
+				counter += TempCount;
 			}
-			else if (to >= Rooms[i].Booked[j].getFrom())
-			{
-				Placeholder = Rooms[i].Booked[j].getFrom();
-				do
-				{
-					TempCount++;
-					MoveOne(Placeholder);
-				} while (Placeholder <= Rooms[i].Booked[j].getTo() && Placeholder <= to);
-			}
-			counter += TempCount;
+			cout << "Room " << Rooms[i].number << " booked for " << counter << " days" << endl;
+			FoundFile << "Room " << Rooms[i].number << " booked for " << counter << " days\n";
 		}
-		cout << "Room " << Rooms[i].number << " booked for " << counter << " days" << endl;
-	}
-
+	
 }
 
 void LookForRoom(Room Rooms[NumberOfRooms])
