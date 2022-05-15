@@ -211,6 +211,7 @@ public:
 		cout << number << " " << beds << "" << ResCounter << endl;
 	}*/
 
+	friend bool Available(Room Rooms[NumberOfRooms], int i, Date from, Date to);
 	friend void BookRoom(Room Rooms[NumberOfRooms]);
 	friend void FindVacant(Room Rooms[NumberOfRooms]);
 	friend bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i);
@@ -230,75 +231,20 @@ bool FindRoom(int num, Room Rooms[NumberOfRooms], int& i)
 	return 0;
 }
 
-void BookRoom(Room Rooms[NumberOfRooms])
+bool Available (Room Rooms[NumberOfRooms], int i, Date from, Date to)
 {
-	int num;
-	cout << "Which room would you like to book?" << endl;
-	cin >> num;
-
-	bool found = 0, free = 1;
-	int i;
-
-	if (FindRoom(num, Rooms, i))
+	for (int j = 0; j < Rooms[i].ResCounter; j++)
 	{
-		int day, month, year;
-		do
+		if ((to >= Rooms[i].Booked[j].getFrom() && to <= Rooms[i].Booked[j].getTo()) ||
+			(from >= Rooms[i].Booked[j].getFrom() && from <= Rooms[i].Booked[j].getTo()) ||
+			(Rooms[i].Booked[j].getFrom() >= from && Rooms[i].Booked[j].getTo() <= to))
 		{
-			cout << "Insert first day of reservation (DD MM YYYY): ";
-			cin >> day >> month >> year;
-		} while (DateCorrect(day, month, year) == 0);
-		Date from(day, month, year);
-		do
-		{
-			cout << "Insert last day of reservation (DD MM YYYY): ";
-			cin >> day >> month >> year;
-		} while (DateCorrect(day, month, year) == 0);
-		Date to(day, month, year);
-
-		if (from > to)
-		{
-			Date Placeholder;
-			Placeholder = to;
-			to = from;
-			from = Placeholder;
-		}
-
-
-		for (int j = 0; j < Rooms[i].ResCounter; j++)
-		{
-			if ((to >= Rooms[i].Booked[j].getFrom() && to <= Rooms[i].Booked[j].getTo()) ||
-				(from >= Rooms[i].Booked[j].getFrom() && from <= Rooms[i].Booked[j].getTo()) ||
-				(Rooms[i].Booked[j].getFrom() >= from && Rooms[i].Booked[j].getTo() <= to))
-			{
-				free = 0;
-				break;
-			}
-		}
-		if (free)
-		{
-			cout << endl;
-			cout << "Guest Name: ";
-			string Name, Notes = "";
-			getline(cin >> ws, Name, '\n');
-			cout << "Are there any notes to the reservation?" << endl;;
-			char answer;
-			do
-			{
-				cout << "Type y / n: ";
-				cin >> answer;
-			} while (answer != 'y' && answer != 'n');
-			if (answer == 'y')
-			{
-				cout << "Notes: ";
-				getline(cin >> ws, Notes, '\n');
-			}
-			Reservation New(Name, from, to, Notes);
-
-			Rooms[i].Book(New);
+			return 0;
 		}
 	}
-	else cout << "A room with that number doesn't exist" << endl;;
+	return 1;
 }
+
 
 void FindVacant(Room Rooms[NumberOfRooms])
 {
@@ -403,6 +349,14 @@ void LookForRoom(Room Rooms[NumberOfRooms])
 	} while (DateCorrect(day, month, year) == 0);
 	Date to(day, month, year);
 
+	if (from > to)
+	{
+		Date Placeholder;
+		Placeholder = to;
+		to = from;
+		from = Placeholder;
+	}
+
 	do
 	{
 		cout << "Beds: ";
@@ -428,7 +382,7 @@ void LookForRoom(Room Rooms[NumberOfRooms])
 				}
 				if (free)
 				{
-					cout << Rooms[i].number;
+					cout << Rooms[i].number << endl;
 					found = 1;
 				}
 			}
@@ -506,7 +460,60 @@ int main()
 		{
 		case 1:
 		{
-			BookRoom(Rooms);
+			int num;
+			cout << "Which room would you like to book?" << endl;
+			cin >> num;
+
+			int i;
+
+			if (FindRoom(num, Rooms, i))
+			{
+				int day, month, year;
+				do
+				{
+					cout << "Insert first day of reservation (DD MM YYYY): ";
+					cin >> day >> month >> year;
+				} while (DateCorrect(day, month, year) == 0);
+				Date from(day, month, year);
+				do
+				{
+					cout << "Insert last day of reservation (DD MM YYYY): ";
+					cin >> day >> month >> year;
+				} while (DateCorrect(day, month, year) == 0);
+				Date to(day, month, year);
+
+				if (from > to)
+				{
+					Date Placeholder;
+					Placeholder = to;
+					to = from;
+					from = Placeholder;
+				}
+
+				if (Available(Rooms, i, from, to))
+				{
+					cout << endl;
+					cout << "Guest Name: ";
+					string Name, Notes = "";
+					getline(cin >> ws, Name, '\n');
+					cout << "Are there any notes to the reservation?" << endl;;
+					char answer;
+					do
+					{
+						cout << "Type y / n: ";
+						cin >> answer;
+					} while (answer != 'y' && answer != 'n');
+					if (answer == 'y')
+					{
+						cout << "Notes: ";
+						getline(cin >> ws, Notes, '\n');
+					}
+					Reservation New(Name, from, to, Notes);
+
+					Rooms[i].Book(New);
+				}
+			}
+			else cout << "A room with that number doesn't exist" << endl;
 			break;
 		}
 		case 2:
@@ -541,10 +548,63 @@ int main()
 		case 5:
 		{
 			LookForRoom(Rooms);
+			break;
 		}
 		case 6:
 		{
+			int num, i;
+			cout << "Which room would you like to close?";
+			cin >> num;
 
+			if (FindRoom(num, Rooms, i))
+			{
+				int day, month, year;
+				do
+				{
+					cout << "Insert start date (DD MM YYYY): ";
+					cin >> day >> month >> year;
+				} while (DateCorrect(day, month, year) == 0);
+				Date from(day, month, year);
+				do
+				{
+					cout << "Insert end date (DD MM YYYY): ";
+					cin >> day >> month >> year;
+				} while (DateCorrect(day, month, year) == 0);
+				Date to(day, month, year);
+
+				if (from > to)
+				{
+					Date Placeholder;
+					Placeholder = to;
+					to = from;
+					from = Placeholder;
+				}
+
+				if (Available(Rooms, i, from, to))
+				{
+					cout << endl;
+					string Notes = "";
+					cout << "Are there any notes to the reservation?" << endl;;
+					char answer;
+					do
+					{
+						cout << "Type y / n: ";
+						cin >> answer;
+					} while (answer != 'y' && answer != 'n');
+					if (answer == 'y')
+					{
+						cout << "Notes: ";
+						getline(cin >> ws, Notes, '\n');
+					}
+					Reservation New("", from, to, Notes);
+
+					Rooms[i].Book(New);
+				}
+				else cout << "Room is booked during designated time period";
+
+			}
+			else "A room with that number doesn't exist";
+			break;
 		}
 		}
 		cout << "....." << endl;
