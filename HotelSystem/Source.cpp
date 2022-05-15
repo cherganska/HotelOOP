@@ -187,7 +187,8 @@ public:
 
 	/*~Room()
 	{
-		delete[] &Booked;
+		for (int i = 0; i < MaxRes; i++) delete Booked[i];
+		delete[] Booked;
 	}*/
 
 	void Book(Reservation Save)
@@ -299,7 +300,6 @@ void CheckBusy(Room Rooms[NumberOfRooms])
 
 	ofstream FoundFile;
 	
-	cout << FileName;
 	FoundFile.open(FileName, ios::out);
 
 
@@ -402,24 +402,24 @@ void LookForRoom(Room Rooms[NumberOfRooms])
 }
 
 
-/*
-void InputRooms()
-{
-	int Rooms, Number, Beds;
-	cout << "Number of rooms: ";
-	cin >> Rooms;
 
-	ofstream RoomFile;
-	RoomFile.open("Rooms.txt", ios::out);
-	for (int i = 0; i < Rooms; i++)
-	{
-		cout << "Room number and beds:";
-		cin >> Number >> Beds;
-		Room NewRoom(Number, Beds);
-		RoomFile.write((char*)&NewRoom, sizeof(NewRoom));
-	}
-}
-*/
+//void InputRooms()
+//{
+//	int Rooms, Number, Beds;
+//	cout << "Number of rooms: ";
+//	cin >> Rooms;
+//
+//	ofstream RoomFile;
+//	RoomFile.open("Rooms.txt", ios::out);
+//	for (int i = 0; i < Rooms; i++)
+//	{
+//		cout << "Room number and beds:";
+//		cin >> Number >> Beds;
+//		Room NewRoom(Number, Beds);
+//		RoomFile.write((char*)&NewRoom, sizeof(NewRoom));
+//	}
+//}
+
 
 
 //Menu
