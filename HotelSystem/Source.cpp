@@ -163,8 +163,8 @@ public:
 
 	void operator= (Reservation Second)
 	{
-		Guest.assign(Second.Guest);
-		Notes.assign(Second.Notes);
+		Guest = Second.Guest;
+		Notes = Second.Notes;
 		From = Second.From;
 		To = Second.To;
 	}
@@ -610,9 +610,9 @@ int main()
 	} while (operation != 7);
 
 	RoomFile.close();
-	/*RoomFile.open("Rooms.txt", ios::out);
+	RoomFile.open("Rooms.txt", ios::out);
 	for (int i = 0; i < NumberOfRooms; i++)
 	{
 		RoomFile.write((char*)&Rooms[i], sizeof(Rooms[i]));
-	}*/
+	}
 }
